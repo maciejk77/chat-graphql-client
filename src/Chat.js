@@ -52,8 +52,8 @@ const Chat = () => {
         label="Content"
         value={state.content}
         onChange={(e) => setState({ ...state, content: e.target.value })}
-        onKeyUp={(evt) => {
-          if (evt.keyCode === 13) {
+        onKeyUp={(e) => {
+          if (e.keyCode === 13) {
             onSend();
           }
         }}

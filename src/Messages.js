@@ -9,46 +9,53 @@ const Messages = ({ user }) => {
 
   return (
     <>
-      {data.messages.map(({ id, user: messageUser, content }) => (
-        <div
-          key={id}
-          style={{
-            display: 'flex',
-            justifyContent: user === messageUser ? 'flex-end' : 'flex-start',
-            paddingBottom: '1rem',
-          }}
-        >
-          {user !== messageUser && (
-            <div
-              style={{
-                height: '50',
-                width: 50,
-                marginRight: '0.5em',
-                border: '2px solid #e5e6ea',
-                borderRadius: 25,
-                textAlign: 'center',
-                fontSize: '18pt',
-                paddingTop: 5,
-              }}
-            >
-              {messageUser.slice(0, 2).toUpperCase()}
-            </div>
-          )}
+      {data.messages.map(({ id, user: messageUser, content }) => {
+        const isActiveUser = user === messageUser;
+        return (
           <div
+            key={id}
             style={{
-              background: user === messageUser ? '#58bf56' : '#e5e6ea',
-              color: user === messageUser ? 'white' : 'black',
-              padding: '1em',
-              borderRadius: '1em',
-              maxWidth: '60%',
+              justifyContent: isActiveUser ? 'flex-end' : 'flex-start',
+              ...styles.bubblePosition,
             }}
           >
-            {content}
+            {!isActiveUser && (
+              <div style={styles.userIcon}>
+                {messageUser.slice(0, 2).toUpperCase()}
+              </div>
+            )}
+            <div
+              style={{
+                background: isActiveUser ? '#58bf56' : '#e5e6ea',
+                color: isActiveUser ? 'white' : 'black',
+                ...styles.bubble,
+              }}
+            >
+              {content}
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </>
   );
+};
+
+const styles = {
+  bubblePosition: {
+    display: 'flex',
+    paddingBottom: '1rem',
+  },
+  bubble: { padding: '1em', borderRadius: '1em', maxWidth: '60%' },
+  userIcon: {
+    height: '50',
+    width: 50,
+    marginRight: '0.5em',
+    border: '2px solid #e5e6ea',
+    borderRadius: 25,
+    textAlign: 'center',
+    fontSize: '18pt',
+    paddingTop: 5,
+  },
 };
 
 export default Messages;
