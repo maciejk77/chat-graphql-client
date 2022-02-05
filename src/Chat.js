@@ -3,12 +3,11 @@ import {
   ApolloClient,
   InMemoryCache,
   ApolloProvider,
-  // useQuery,
-  useSubscription,
   useMutation,
-  gql,
 } from '@apollo/client';
 import { WebSocketLink } from '@apollo/client/link/ws';
+import { POST_MESSAGE } from './mutations';
+import Messages from './Messages';
 
 const link = new WebSocketLink({
   uri: 'ws://localhost:4000',
@@ -23,82 +22,17 @@ const client = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
-const GET_MESSAGES = gql`
-  subscription {
-    messages {
-      id
-      user
-      content
-    }
-  }
-`;
-
-const POST_MESSAGE = gql`
-  mutation ($user: String!, $content: String!) {
-    postMessage(user: $user, content: $content)
-  }
-`;
-
-const Messages = ({ user }) => {
-  const { data } = useSubscription(GET_MESSAGES);
-
-  if (!data) return null;
-
-  return (
-    <>
-      {data.messages.map(({ id, user: messageUser, content }) => (
-        <div
-          key={id}
-          style={{
-            display: 'flex',
-            justifyContent: user === messageUser ? 'flex-end' : 'flex-start',
-            paddingBottom: '1rem',
-          }}
-        >
-          {user !== messageUser && (
-            <div
-              style={{
-                height: '50',
-                width: 50,
-                marginRight: '0.5em',
-                border: '2px solid #e5e6ea',
-                borderRadius: 25,
-                textAlign: 'center',
-                fontSize: '18pt',
-                paddingTop: 5,
-              }}
-            >
-              {messageUser.slice(0, 2).toUpperCase()}
-            </div>
-          )}
-          <div
-            style={{
-              background: user === messageUser ? '#58bf56' : '#e5e6ea',
-              color: user === messageUser ? 'white' : 'black',
-              padding: '1em',
-              borderRadius: '1em',
-              maxWidth: '60%',
-            }}
-          >
-            {content}
-          </div>
-        </div>
-      ))}
-    </>
-  );
-};
-
 const Chat = () => {
   const [state, setState] = useState({
     user: 'Pedro',
     content: '',
   });
 
-  const [postMesage] = useMutation(POST_MESSAGE);
+  const [postMessage] = useMutation(POST_MESSAGE);
 
   const onSend = () => {
     if (state.content.length > 0) {
-      postMesage({ variables: state });
+      postMessage({ variables: state });
     }
     setState({
       ...state,
@@ -119,7 +53,7 @@ const Chat = () => {
         value={state.content}
         onChange={(e) => setState({ ...state, content: e.target.value })}
         onKeyUp={(evt) => {
-          if (evt.key === 13) {
+          if (evt.keyCode === 13) {
             onSend();
           }
         }}
